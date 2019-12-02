@@ -580,28 +580,42 @@ class Utilization(Helpers):
         Returns:
             int: days in period that ppts are in the indicated utilization
         """
-        admit_in_time_params = [params[1]] + list(params)
+        start_date, end_date = params
 
-        during_query = f"""
-        SELECT SUM(ifnull(julianday(discharge_date), julianday(?)) - julianday(admission_date)) as days
-        FROM {utilization_table} ut
-        WHERE admission_date BETWEEN ? AND ?
-        """
+        query1 = [start_date, end_date, start_date, end_date]
+        query2 = [start_date, start_date, start_date, end_date]
+        query3 = [end_date, start_date, end_date, end_date]
+        query4 = [end_date, start_date, start_date, end_date]
 
-        admit_before_time_params = [params[1], params[0], params[0], params[0]]
-
-        before_query = f"""
-        SELECT SUM(julianday(?) - julianday(?)) as days
-        FROM {utilization_table} ut
-        WHERE (discharge_date >= ?
-        OR discharge_date IS NULL)
-        AND admission_date < ?
-        """
-
-        admit_during = self.single_value_query(during_query, admit_in_time_params)
-        admit_before = self.single_value_query(before_query, admit_before_time_params)
-
-        return admit_during + admit_before
+        all_params = query1 + query2 + query3 + query4
+        query = """
+            with all_days as (
+            SELECT member_id, (julianday(discharge_date) - julianday(admission_date))+1 as days
+            FROM {utilization_table}
+            WHERE admission_date BETWEEN ? AND ?
+            AND discharge_date BETWEEN ? AND ?
+            UNION
+            SELECT member_id, (julianday(discharge_date) - julianday(?))+1 as days
+            FROM {utilization_table}
+            WHERE admission_date < ?
+            AND discharge_date BETWEEN ? AND ?
+            UNION
+            SELECT member_id, (julianday(?) - julianday(admission_date))+1 as days
+            FROM {utilization_table}
+            WHERE admission_date BETWEEN ? AND ?
+            AND (discharge_date > ?
+            OR discharge_date IS NULL)
+            UNION
+            SELECT member_id, (julianday(?) - julianday(?))+1 as days
+            FROM {utilization_table}
+            WHERE admission_date < ?
+            AND (discharge_date > ?
+            OR discharge_date IS NULL)
+            )
+            SELECT SUM(days)
+            FROM all_days
+            """
+        return self.single_value_query(query, all_params)
 
     def days_per_100MM(self, params, utilization_table):
         """
