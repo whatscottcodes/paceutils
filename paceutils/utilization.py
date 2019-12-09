@@ -588,7 +588,7 @@ class Utilization(Helpers):
         query4 = [end_date, start_date, start_date, end_date]
 
         all_params = query1 + query2 + query3 + query4
-        query = """
+        query = f"""
             with all_days as (
             SELECT member_id, (julianday(discharge_date) - julianday(admission_date))+1 as days
             FROM {utilization_table}
