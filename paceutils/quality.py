@@ -24,7 +24,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: returns a list of ppts who need the Pneumococcal 23 vaccination
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
         query = """SELECT e.member_id, last, first, team, center, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM enrollment e
@@ -36,6 +36,10 @@ class Quality(Helpers):
         AND (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND e.member_id NOT IN (
         SELECT member_id
         FROM pneumo 
@@ -55,7 +59,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: returns a list of ppts who need the PCV 13 vaccination
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
 
         query = """SELECT e.member_id, last, first, team, center, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
@@ -68,6 +72,10 @@ class Quality(Helpers):
         AND (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND e.member_id NOT IN (
         SELECT member_id
         FROM pneumo 
@@ -88,7 +96,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: returns a list of ppts who need the Pneumococcal 23, but not PCV 13
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
 
         query = """SELECT e.member_id, last, first, team, center, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
@@ -101,6 +109,10 @@ class Quality(Helpers):
         AND (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND e.member_id NOT IN (
         SELECT member_id
         FROM pneumo 
@@ -124,7 +136,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: returns a list of ppts who need the PCV 13, but not Pneumococcal 23
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
 
         query = """SELECT e.member_id, last, first, team, center, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
@@ -137,6 +149,10 @@ class Quality(Helpers):
         AND (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND e.member_id NOT IN (
         SELECT member_id
         FROM pneumo 
@@ -161,7 +177,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: returns a list of ppts who need PCV 13 and Pneumococcal 23
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
 
         if include_refused:
             query = """SELECT e.member_id, last, first, team, center, enrollment_date,
@@ -175,6 +191,10 @@ class Quality(Helpers):
             AND (disenrollment_date >= ?
             OR disenrollment_date IS NULL)
             AND enrollment_date <= ?
+            AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+            AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
             AND e.member_id NOT IN (
             SELECT member_id
             FROM pneumo 
@@ -195,6 +215,10 @@ class Quality(Helpers):
             JOIN teams ON centers.member_id=teams.member_id
             WHERE age >= 65
             AND (disenrollment_date >= ?
+            AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+            AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
             OR disenrollment_date IS NULL)
             AND enrollment_date <= ?
             AND e.member_id NOT IN (
@@ -301,7 +325,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: ppts who have refused and not received the vaccination
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
 
         query = """
         SELECT pneumo.member_id, vacc_series, date_administered,
@@ -317,6 +341,10 @@ class Quality(Helpers):
         AND (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND dose_status = 0
         AND e.member_id NOT IN (
             SELECT member_id
@@ -336,7 +364,7 @@ class Quality(Helpers):
         Returns:
             DataFrame: ppts who have received at least one vaccination
         """
-        params = list(params) + [params[1]]
+        params = list(params) + [params[1]] * 3
 
         query = """
         SELECT pneumo.member_id, vacc_series, date_administered,
@@ -352,6 +380,10 @@ class Quality(Helpers):
         AND (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND dose_status = 1;
         """
 
@@ -374,7 +406,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + [f"{yr}-09-01"]
+        params = list(params) + list(params) + [f"{yr}-09-01"]
 
         query = """SELECT DISTINCT(e.member_id), last, first,
         team, center, enrollment_date
@@ -385,6 +417,10 @@ class Quality(Helpers):
         WHERE (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND e.member_id NOT IN (
         SELECT member_id
         FROM influ
@@ -436,7 +472,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + [f"{yr}-09-01"]
+        params = list(params) + list(params) + [f"{yr}-09-01"]
 
         query = """SELECT influ.member_id, vacc_series, date_administered,
         last, first, team, center, enrollment_date
@@ -448,6 +484,10 @@ class Quality(Helpers):
         WHERE (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND date(date_administered) >= ?
         AND dose_status = 1;"""
 
@@ -494,7 +534,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + [f"{yr}-09-01"]
+        params = list(params) + list(params) + [f"{yr}-09-01"]
 
         query = """SELECT influ.member_id, vacc_series, date_administered,
         last, first, team, center, enrollment_date
@@ -506,6 +546,10 @@ class Quality(Helpers):
         WHERE (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
+        AND (centers.end_date >= ? OR
+            centers.end_date IS NULL)
+        AND (teams.end_date >= ? OR
+            teams.end_date IS NULL)
         AND date(date_administered) >= ?
         AND dose_status = 0;"""
 
