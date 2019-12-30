@@ -406,7 +406,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + list(params) + [f"{yr}-09-01"]
+        params = list(params) + list(params) + [f"{yr}-08-01"]
 
         query = """SELECT DISTINCT(e.member_id), last, first,
         team, center, enrollment_date
@@ -443,7 +443,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + [f"{yr}-09-01"]
+        params = list(params) + [f"{yr}-08-01"]
 
         query = """SELECT COUNT(DISTINCT(influ.member_id))
         FROM influ  
@@ -472,7 +472,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + list(params) + [f"{yr}-09-01"]
+        params = list(params) + list(params) + [f"{yr}-08-01"]
 
         query = """SELECT influ.member_id, vacc_series, date_administered,
         last, first, team, center, enrollment_date
@@ -507,7 +507,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + [f"{yr}-09-01"]
+        params = list(params) + [f"{yr}-08-01"]
 
         query = """SELECT COUNT(DISTINCT(influ.member_id))
         FROM influ  
@@ -534,7 +534,7 @@ class Quality(Helpers):
         yr = datetime.datetime.now().year
         if int(params[0][5:7]) < 4:
             yr -= 1
-        params = list(params) + list(params) + [f"{yr}-09-01"]
+        params = list(params) + list(params) + [f"{yr}-08-01"]
 
         query = """SELECT influ.member_id, vacc_series, date_administered,
         last, first, team, center, enrollment_date
