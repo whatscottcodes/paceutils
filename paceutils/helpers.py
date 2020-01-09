@@ -63,7 +63,7 @@ class Helpers(object):
         conn.close()
         return result
 
-    def dataframe_query(self, q, params=None):
+    def dataframe_query(self, q, params=None, parse_dates=None):
         """
         Function for running a query on the database
         that returns a pandas DataFrame
@@ -76,7 +76,7 @@ class Helpers(object):
             DataFrame: pandas DataFrame
         """
         conn = sqlite3.connect(self.db_filepath)
-        df = pd.read_sql(q, conn, params=params)
+        df = pd.read_sql(q, conn, params=params, parse_dates=parse_dates)
         conn.close()
         return df
 
