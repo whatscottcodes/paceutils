@@ -507,7 +507,8 @@ class Utilization(Helpers):
 
         query = f"""
         SELECT * FROM {utilization_table}
-        WHERE discharge_date BETWEEN ? AND ?
+        WHERE (discharge_date >= ? OR discharge_date IS NULL)
+        AND admission_date <= ?
         AND los >= ?;
         """
 
