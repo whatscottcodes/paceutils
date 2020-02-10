@@ -14,7 +14,7 @@ class CenterDemographics(Helpers):
         AND enrollment_date <= ?
         AND medicare = 1
         AND medicaid = 1
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -43,7 +43,7 @@ class CenterDemographics(Helpers):
         AND enrollment_date <= ?
         AND medicare = 1
         AND medicaid = 0
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -72,7 +72,7 @@ class CenterDemographics(Helpers):
         AND enrollment_date <= ?
         AND medicare = 0
         AND medicaid = 1
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -101,7 +101,7 @@ class CenterDemographics(Helpers):
         AND enrollment_date <= ?
         AND medicare = 0
         AND medicaid = 0
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -132,7 +132,7 @@ class CenterDemographics(Helpers):
         WHERE (e.disenrollment_date >= ?
         OR e.disenrollment_date IS NULL)
         AND e.enrollment_date <= ?
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;
@@ -154,7 +154,7 @@ class CenterDemographics(Helpers):
             WHERE (e.disenrollment_date >= ? OR
             e.disenrollment_date IS NULL)
             AND e.enrollment_date <= ?
-            AND center = ?
+            AND centers.center = ?
             AND (centers.end_date >= ? 
             OR centers.end_date IS NULL)
             AND centers.start_date <= ?
@@ -176,7 +176,7 @@ class CenterDemographics(Helpers):
             WHERE (e.disenrollment_date >= ? OR
             e.disenrollment_date IS NULL)
             AND e.enrollment_date <= ?
-            AND center = ?
+            AND centers.center = ?
             AND (centers.end_date >= ? 
             OR centers.end_date IS NULL)
             AND centers.start_date <= ?

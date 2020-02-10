@@ -61,10 +61,10 @@ class Enrollment(Helpers):
         query = """SELECT COUNT(*)
         FROM enrollment
         WHERE enrollment_date <= ?
-        AND (disenrollment_date > ?
+        AND (disenrollment_date >= ?
             OR disenrollment_date IS NULL);"""
 
-        return self.single_value_query(query, params)
+        return self.single_value_query(query, (params[1], params[1]))
 
     def member_months(self, params):
         """

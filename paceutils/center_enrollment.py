@@ -8,7 +8,7 @@ class CenterEnrollment(Helpers):
         FROM enrollment 
         JOIN centers on enrollment.member_id=centers.member_id
         WHERE disenrollment_date IS NULL
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?
@@ -24,7 +24,7 @@ class CenterEnrollment(Helpers):
         WHERE (disenrollment_date >= ?
             OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -40,7 +40,7 @@ class CenterEnrollment(Helpers):
         WHERE enrollment_date <= ?
         AND (disenrollment_date >= ?
             OR disenrollment_date IS NULL)
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -54,7 +54,7 @@ class CenterEnrollment(Helpers):
         FROM enrollment
         JOIN centers on enrollment.member_id=centers.member_id
         WHERE disenrollment_date BETWEEN ? AND ?
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?"""
@@ -68,7 +68,7 @@ class CenterEnrollment(Helpers):
                     JOIN centers on enrollment.member_id=centers.member_id
                     WHERE disenrollment_date BETWEEN ? AND ?
                     AND disenroll_type = 'Voluntary'
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?;
@@ -83,7 +83,7 @@ class CenterEnrollment(Helpers):
         FROM enrollment
         JOIN centers on enrollment.member_id=centers.member_id
         WHERE enrollment_date BETWEEN ? AND ?
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
@@ -97,7 +97,7 @@ class CenterEnrollment(Helpers):
                     JOIN centers on enrollment.member_id=centers.member_id
                     WHERE disenrollment_date BETWEEN ? AND ?
                     AND disenroll_type = 'Deceased'
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -121,7 +121,7 @@ class CenterEnrollment(Helpers):
         WHERE (disenrollment_date >= ?
         OR disenrollment_date IS NULL)
         AND enrollment_date <= ?
-        AND center = ?
+        AND centers.center = ?
         AND (centers.end_date >= ? 
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;
@@ -169,7 +169,7 @@ class CenterEnrollment(Helpers):
             OR disenrollment_date IS NULL)
             AND enrollment_date <= ?
             AND ad.active = 1
-            AND center = ?
+            AND centers.center = ?
             AND (centers.end_date >= ? 
             OR centers.end_date IS NULL)
             AND centers.start_date <= ?
@@ -192,7 +192,7 @@ class CenterEnrollment(Helpers):
             JOIN enrollment e on p.member_id=e.member_id
             JOIN centers ON e.member_id=centers.member_id
             WHERE e.disenrollment_date IS NULL
-            AND center = ?
+            AND centers.center = ?
             GROUP BY a.member_id
             """
 
@@ -204,7 +204,7 @@ class CenterEnrollment(Helpers):
             JOIN enrollment e on p.member_id=e.member_id
             JOIN centers ON e.member_id=centers.member_id
             WHERE e.disenrollment_date NOT NULL
-            AND center = ?
+            AND centers.center = ?
             GROUP BY a.member_id
             """
         enrolled_df = self.dataframe_query(enrolled_address_query, params=[center])
@@ -222,7 +222,7 @@ class CenterEnrollment(Helpers):
                     WHERE enrollment_date BETWEEN ? AND ?
                     AND medicare = 1
                     AND medicaid = 1
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -239,7 +239,7 @@ class CenterEnrollment(Helpers):
                     WHERE enrollment_date BETWEEN ? AND ?
                     AND medicare = 1
                     AND medicaid = 0
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -256,7 +256,7 @@ class CenterEnrollment(Helpers):
                     WHERE enrollment_date BETWEEN ? AND ?
                     AND medicare = 0
                     AND medicaid = 1
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -273,7 +273,7 @@ class CenterEnrollment(Helpers):
                     WHERE enrollment_date BETWEEN ? AND ?
                     AND medicare = 0
                     AND medicaid = 0
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -289,7 +289,7 @@ class CenterEnrollment(Helpers):
                     WHERE disenrollment_date BETWEEN ? AND ?
                     AND medicare = 1
                     AND medicaid = 1
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -306,7 +306,7 @@ class CenterEnrollment(Helpers):
                     WHERE disenrollment_date BETWEEN ? AND ?
                     AND medicare = 1
                     AND medicaid = 0
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -323,7 +323,7 @@ class CenterEnrollment(Helpers):
                     WHERE disenrollment_date BETWEEN ? AND ?
                     AND medicare = 0
                     AND medicaid = 1
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?
@@ -340,7 +340,7 @@ class CenterEnrollment(Helpers):
                     WHERE disenrollment_date BETWEEN ? AND ?
                     AND medicare = 0
                     AND medicaid = 0
-                    AND center = ?
+                    AND centers.center = ?
                     AND (centers.end_date >= ? 
                     OR centers.end_date IS NULL)
                     AND centers.start_date <= ?

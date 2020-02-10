@@ -447,9 +447,7 @@ class Demographics(Helpers):
                 OR instr(icd10, 'K74') > 0
                 OR instr(icd10, 'E10') > 0
                 OR instr(icd10, 'E11') > 0
-                OR instr(icd10, 'E12') > 0
                 OR instr(icd10, 'E13') > 0
-                OR instr(icd10, 'E14') > 0
                 OR instr(icd10, 'I10') > 0
                 OR instr(icd10, 'I12') > 0
                 OR instr(icd10, 'I15') > 0
@@ -482,7 +480,6 @@ class Demographics(Helpers):
                 OR instr(icd10, 'N75') > 0
                 OR instr(icd10, 'N76') > 0
                 OR instr(icd10, 'N77') > 0
-                OR instr(icd10, 'N78') > 0
                 OR instr(icd10, 'N8') > 0
                 OR instr(icd10, 'N9') > 0
                 )
@@ -505,7 +502,9 @@ class Demographics(Helpers):
         """
 
         query = f"""
-            SELECT dx.member_id, COUNT(DISTINCT(dx.icd10)) as count FROM dx
+            SELECT dx.member_id,
+            COUNT(DISTINCT(substr(dx.icd10, 0, instr(dx.icd10, '.')))) as count
+            FROM dx
             JOIN enrollment e ON dx.member_id=e.member_id
             WHERE (instr(icd10, 'G30') > 0
                 OR instr(icd10, 'J4') > 0
@@ -526,9 +525,7 @@ class Demographics(Helpers):
                 OR instr(icd10, 'K74') > 0
                 OR instr(icd10, 'E10') > 0
                 OR instr(icd10, 'E11') > 0
-                OR instr(icd10, 'E12') > 0
                 OR instr(icd10, 'E13') > 0
-                OR instr(icd10, 'E14') > 0
                 OR instr(icd10, 'I10') > 0
                 OR instr(icd10, 'I12') > 0
                 OR instr(icd10, 'I15') > 0
@@ -561,7 +558,6 @@ class Demographics(Helpers):
                 OR instr(icd10, 'N75') > 0
                 OR instr(icd10, 'N76') > 0
                 OR instr(icd10, 'N77') > 0
-                OR instr(icd10, 'N78') > 0
                 OR instr(icd10, 'N8') > 0
                 OR instr(icd10, 'N9') > 0
                 )
