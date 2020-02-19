@@ -34,14 +34,14 @@ class CenterEnrollment(Helpers):
     def census_on_end_date(self, params, center):
         params = list(params) + [center] + list(params)
 
-        query = """SELECT COUNT(*)
+        query = """SELECT COUNT(DISTINCT(enrollment.member_id))
         FROM enrollment
         JOIN centers on enrollment.member_id=centers.member_id
         WHERE enrollment_date <= ?
         AND (disenrollment_date >= ?
             OR disenrollment_date IS NULL)
         AND centers.center = ?
-        AND (centers.end_date >= ? 
+        AND (centers.end_date >= ?
         OR centers.end_date IS NULL)
         AND centers.start_date <= ?;"""
 
