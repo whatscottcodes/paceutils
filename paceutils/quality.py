@@ -25,7 +25,7 @@ class Quality(Helpers):
             DataFrame: returns a list of ppts who need the Pneumococcal 23 vaccination
         """
         params = list(params) + [params[1]] * 3
-        query = """SELECT e.member_id, last, first, team, center, enrollment_date,
+        query = """SELECT e.member_id, last, first, team, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM enrollment e
         JOIN ppts p on e.member_id = p.member_id
@@ -61,7 +61,7 @@ class Quality(Helpers):
         """
         params = list(params) + [params[1]] * 3
 
-        query = """SELECT e.member_id, last, first, team, center, enrollment_date,
+        query = """SELECT e.member_id, last, first, team, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM enrollment e
         JOIN ppts p on e.member_id = p.member_id
@@ -98,7 +98,7 @@ class Quality(Helpers):
         """
         params = list(params) + [params[1]] * 3
 
-        query = """SELECT e.member_id, last, first, team, center, enrollment_date,
+        query = """SELECT e.member_id, last, first, team, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM enrollment e
         JOIN ppts p on e.member_id = p.member_id
@@ -138,7 +138,7 @@ class Quality(Helpers):
         """
         params = list(params) + [params[1]] * 3
 
-        query = """SELECT e.member_id, last, first, team, center, enrollment_date,
+        query = """SELECT e.member_id, last, first, team, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM enrollment e
         JOIN ppts p on e.member_id = p.member_id
@@ -180,7 +180,7 @@ class Quality(Helpers):
         params = list(params) + [params[1]] * 3
 
         if include_refused:
-            query = """SELECT e.member_id, last, first, team, center, enrollment_date,
+            query = """SELECT e.member_id, last, first, team, enrollment_date,
             ((julianday(?) - julianday(d.dob)) / 365.25) as age
             FROM enrollment e
             JOIN ppts p on e.member_id = p.member_id
@@ -206,7 +206,7 @@ class Quality(Helpers):
             AND dose_status=1);
             """
         else:
-            query = """SELECT e.member_id, last, first, team, center, enrollment_date,
+            query = """SELECT e.member_id, last, first, team, enrollment_date,
             ((julianday(?) - julianday(d.dob)) / 365.25) as age
             FROM enrollment e
             JOIN ppts p on e.member_id = p.member_id
@@ -329,7 +329,7 @@ class Quality(Helpers):
 
         query = """
         SELECT pneumo.member_id, vacc_series, date_administered,
-        last, first, team, center, enrollment_date,
+        last, first, team, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM pneumo
         JOIN enrollment e ON pneumo.member_id = e.member_id
@@ -368,7 +368,7 @@ class Quality(Helpers):
 
         query = """
         SELECT pneumo.member_id, vacc_series, date_administered,
-        last, first, team, center, enrollment_date,
+        last, first, team, enrollment_date,
         ((julianday(?) - julianday(d.dob)) / 365.25) as age
         FROM pneumo
         JOIN enrollment e ON pneumo.member_id = e.member_id
@@ -409,7 +409,7 @@ class Quality(Helpers):
         params = list(params) + list(params) + [f"{yr}-08-01"]
 
         query = """SELECT DISTINCT(e.member_id), last, first,
-        team, center, enrollment_date
+        team, enrollment_date
         FROM enrollment e 
         JOIN ppts p on e.member_id = p.member_id
         JOIN centers ON p.member_id=centers.member_id
@@ -475,7 +475,7 @@ class Quality(Helpers):
         params = list(params) + list(params) + [f"{yr}-08-01"]
 
         query = """SELECT influ.member_id, vacc_series, date_administered,
-        last, first, team, center, enrollment_date
+        last, first, team, enrollment_date
         FROM influ  
         JOIN enrollment e on influ.member_id = e.member_id
         JOIN ppts p ON e.member_id = p.member_id
@@ -537,7 +537,7 @@ class Quality(Helpers):
         params = list(params) + list(params) + [f"{yr}-08-01"]
 
         query = """SELECT influ.member_id, vacc_series, date_administered,
-        last, first, team, center, enrollment_date
+        last, first, team, enrollment_date
         FROM influ 
         JOIN enrollment e on influ.member_id = e.member_id
         JOIN ppts p ON e.member_id = p.member_id
