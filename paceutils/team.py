@@ -23,7 +23,7 @@ class Team(Helpers):
         Returns:
             DataFrame: admissions by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = f"""
         SELECT team, count(*) as '{utilization_table} admissions'
@@ -33,6 +33,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND admission_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -49,7 +50,7 @@ class Team(Helpers):
         Returns:
             DataFrame: admissions by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = f"""
         SELECT team, count(*) as 'er_only'
@@ -59,6 +60,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND admission_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -79,7 +81,7 @@ class Team(Helpers):
         Returns:
             DataFrame: utilization days by team
         """
-        admit_in_time_params = [params[1]] + list(params) + list(params)
+        admit_in_time_params = [params[1]] + list(params) + list(params) + [params[1]]
 
         during_query = f"""
         SELECT team, SUM(ifnull(julianday(discharge_date), julianday(?)) - julianday(admission_date)) as days
@@ -89,11 +91,12 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND admission_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
-        admit_before_time_params = [params[1], params[0], params[0], params[0]] + list(
-            params
+        admit_before_time_params = (
+            [params[1], params[0], params[0], params[0]] + list(params) + [params[1]]
         )
 
         before_query = f"""
@@ -106,6 +109,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND admission_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -138,7 +142,7 @@ class Team(Helpers):
         Returns:
             int: discharges by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = f"""
         SELECT team, COUNT(*) as '{utilization_table} discharges'
@@ -148,6 +152,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND discharge_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -164,7 +169,7 @@ class Team(Helpers):
         Returns:
             float: average length of stay by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = f"""
         SELECT team, ROUND(AVG(los), 2) as '{utilization_table} alos'
@@ -174,6 +179,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND discharge_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -190,7 +196,7 @@ class Team(Helpers):
         Returns:
             int: 30-day readmissions by team
         """
-        params = list(params) + [days_since] + list(params)
+        params = list(params) + [days_since] + list(params) + [params[1]]
 
         query = f"""SELECT team, COUNT(*) as '{utilization_table} {days_since} day readmits'
         FROM {utilization_table} ut
@@ -200,6 +206,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND admission_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -217,7 +224,6 @@ class Team(Helpers):
             float: average age of ppts by team
         """
         params = [params[0]] + list(params) + list(params)
-
         query = """SELECT team, ROUND(
             AVG(
                 (julianday(?) - julianday(d.dob)) / 365.25
@@ -320,7 +326,7 @@ class Team(Helpers):
         Returns:
             int: number of ppts in custodial by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = """SELECT team, COUNT(*) as 'ppts in custodial' FROM custodial
         JOIN teams on custodial.member_id= teams.member_id
@@ -330,6 +336,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND admission_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;
         """
 
@@ -361,6 +368,18 @@ class Team(Helpers):
 
         return self.dataframe_query(query, params)
 
+    def team_member_months(self, params):
+        dff = (
+            self.loop_plot_team_df(self.ppts_on_team, params=params, freq="MS")
+            .drop("month", axis=1)
+            .sum()
+            .reset_index()
+            .rename(columns={"index": "team", 0: "participants"})
+        )
+        dff["team"] = dff["team"].str.title()
+
+        return dff
+
     def mortality_by_team(self, params, total=False):
         """
         Number of deaths in period divided by the census during the period
@@ -371,7 +390,7 @@ class Team(Helpers):
         Returns:
             float: Rate of death by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = """SELECT teams.team, COUNT(*) as deaths FROM teams
             JOIN enrollment ON teams.member_id= enrollment.member_id
@@ -380,13 +399,14 @@ class Team(Helpers):
             AND (teams.end_date >= ? 
             OR teams.end_date IS NULL)
             AND teams.start_date <= ?
+            AND disenrollment_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
             GROUP BY team
             """
 
         mortality = self.dataframe_query(query, params)
         if total:
             return mortality
-        team_size = self.ppts_on_team(params[:2])
+        team_size = self.team_member_months(params[:2])
         mortality = mortality.merge(team_size, on="team", how="left")
         mortality["mortality rate"] = mortality["deaths"] / mortality["participants"]
 
@@ -402,7 +422,7 @@ class Team(Helpers):
         Returns:
             float: Count of deaths occurring within 30 days of discharge by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         utilization = Utilization(self.db_filepath)
         deceased_query = """SELECT enrollment.member_id,
@@ -413,7 +433,8 @@ class Team(Helpers):
         AND disenrollment_date BETWEEN ? AND ?
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
-        AND teams.start_date <= ?;"""
+        AND teams.start_date <= ?
+        AND disenrollment_date BETWEEN teams.start_date AND ifnull(teams.end_date, ?);"""
 
         deceased_during_period = self.fetchall_query(deceased_query, params)
 
@@ -499,7 +520,6 @@ class Team(Helpers):
                 by team.
         """
         params = list(params) + list(params)
-
         query = """SELECT team, COUNT(*) as no_admissions
         FROM enrollment
         JOIN teams on enrollment.member_id= teams.member_id
@@ -515,7 +535,7 @@ class Team(Helpers):
         GROUP BY team;"""
 
         df = self.dataframe_query(query, params).merge(
-            self.ppts_on_team(params[:2]), on="team", how="right"
+            self.team_member_months(params[:2]), on="team", how="right"
         )
 
         df["percent with no admissions since enrollment"] = (
@@ -534,7 +554,7 @@ class Team(Helpers):
         Returns:
             float: Pressure ulcer member by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = """SELECT team, COUNT(*) as pressure_wounds FROM wounds
         JOIN teams ON wounds.member_id= teams.member_id
@@ -544,10 +564,11 @@ class Team(Helpers):
         AND date_time_occurred <= ?
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
-        AND teams.start_date <= ?;"""
+        AND teams.start_date <= ?
+        AND date_healed BETWEEN teams.start_date AND ifnull(teams.end_date, ?);"""
 
         df = self.dataframe_query(query, params).merge(
-            self.ppts_on_team(params[:2]), on="team", how="right"
+            self.team_member_months(params[:2]), on="team", how="right"
         )
         df["Wound Rate"] = df["pressure_wounds"] / df["participants"]
 
@@ -564,7 +585,7 @@ class Team(Helpers):
         Returns:
             int: count of incidents by team
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = f"""SELECT team, COUNT(*) as {incident_table} FROM {incident_table} it
         JOIN teams on it.member_id= teams.member_id
@@ -572,6 +593,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND date_time_occurred BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;"""
 
         return self.dataframe_query(query, params)
@@ -589,7 +611,7 @@ class Team(Helpers):
             int: count of incidents per member by team
         """
         df = self.total_incidents_by_team(params, incident_table).merge(
-            self.ppts_on_team(params[:2]), on="team", how="right"
+            self.team_member_months(params[:2]), on="team", how="right"
         )
         df[f"{incident_table} per 100 Ppts"] = (
             df[incident_table] / df["participants"]
@@ -608,7 +630,7 @@ class Team(Helpers):
         Returns:
             int: Count of distinct ppts with an incident in the period by team.
         """
-        params = list(params) + list(params)
+        params = list(params) + list(params) + [params[1]]
 
         query = f"""SELECT team, COUNT(DISTINCT(it.member_id)) as 'individuals w/ {incident_table}'
         FROM {incident_table} it
@@ -617,6 +639,7 @@ class Team(Helpers):
         AND (teams.end_date >= ? 
         OR teams.end_date IS NULL)
         AND teams.start_date <= ?
+        AND date_time_occurred BETWEEN teams.start_date AND ifnull(teams.end_date, ?)
         GROUP BY team;"""
 
         return self.dataframe_query(query, params)
