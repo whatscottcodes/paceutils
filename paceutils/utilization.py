@@ -554,9 +554,8 @@ class Utilization(Helpers):
         params = [params[1]] + list(params) + [x]
 
         query = f"""
-        SELECT member_id, admission_date, discharge_date, 
-        ifnull(julianday(discharge_date), julianday(?)) - julianday(admission_date) as days,
-        facility
+        SELECT member_id, admission_date, discharge_date, facility,
+        ifnull(julianday(discharge_date), julianday(?)) - julianday(admission_date) as days
         FROM {utilization_table}
         WHERE (discharge_date >= ?
         OR discharge_date IS NULL)
